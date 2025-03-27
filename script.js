@@ -1,0 +1,59 @@
+const locationInput = document.getElementById("locationInput");
+const addLocationButton = document.getElementById("addLocationButton");
+const locationsList = document.getElementById("locationsList");
+
+let locationsArray = [];
+let map;
+
+addLocationButton.addEventListener("click", addLocation);
+
+function addLocation() {
+    const location = locationInput.value.trim();
+    if (location !== "") {
+        locationsArray.push(location);
+        locationInput.value = "";
+        updateLocationsList();
+        updateMap(location);
+    }
+}
+
+function updateLocationsList() {
+    locationsList.innerHTML = "";
+    locationsArray.forEach((location) => {
+        const li = document.createElement("li");
+        li.textContent = location;
+        li.addEventListener("click", () => updateMap(location));
+        locationsList.appendChild(li);
+    });
+}
+
+function updateMap(location) {
+    if (!map) {
+        map = L.map("map").setView([0, 0], 2);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "© OpenStreetMap contributors",
+        }).addTo(map);
+    }
+
+    const coordinates = getCoordinatesForLocation(location);
+    if (coordinates) {
+        map.setView(coordinates, 6);
+        L.marker(coordinates).addTo(map).bindPopup(location);
+    } else {
+        alert("Location not found or coordinates not available");
+    }
+}
+
+function getCoordinatesForLocation(location) {
+    const locationCoordinates = {
+        "philippines": [13.41, 122.56],
+        "south korea": [35.9078, 127.7669],
+        "japan": [36.2048, 138.2529],
+        "manila": [14.599512, 120.984222],
+        "iloilo": [10.720150, 122.562103],
+        "china": [35.8617, 104.1954],
+        "thailand": [15.8700, 100.9925]
+    };
+
+    return locationCoordinates[location.toLowerCase()];
+}
